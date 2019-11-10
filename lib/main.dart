@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Code Land",
+      title: "Let's Snip",
       debugShowCheckedModeBanner: false,
       home: MainPage(),
       theme: ThemeData(
@@ -38,8 +38,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   checkLoginStatus() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    if(sharedPreferences == null) {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool CheckValue = prefs.containsKey('value');
+    if(CheckValue == false) {
       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => LoginPage()), (Route<dynamic> route) => false);
     }
   }
@@ -48,7 +49,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Code Land", style: TextStyle(color: Colors.white)),
+        title: Text("Let's Snip", style: TextStyle(color: Colors.white)),
         actions: <Widget>[
           FlatButton(
             onPressed: () {

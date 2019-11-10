@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -38,23 +37,37 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   signIn(String email, pass) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    Map data = {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    String url = "https://fc0cc454c7.to.intercept.rest/v1/attendance";
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String url = "https://ssetapi.herokuapp.com/v1/profile/attendance";
+    print(email);
+    print(pass);
+    Map<String,String> data = {
       'username': email,
       'password': pass
     };
-    var jsonResponse = null;
-    var response = await http.post("https://ssetapi.herokuapp.com/v1/profile/attendance", body: data);
+    final response = await http.post(url,headers: headers, body: json.encode(data));
     if(response.statusCode == 200) {
-      jsonResponse = json.decode(response.body);
-      if(jsonResponse != null) {
+      print(response.body);
+      String value = response.body;
+      if(value != null) {
         setState(() {
           _isLoading = false;
+          print("State Set");
         });
-        sharedPreferences.setString("token", jsonResponse['token']);
-        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => MainPage()), (Route<dynamic> route) => false);
+        prefs.setBool('boolValue', true);
+//        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => MainPage()), (Route<dynamic> route) => false);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => MainPage()));
       }
+      else{
+        setState(() {
+          Scaffold.of(context)
+              .showSnackBar(SnackBar(content: Text('Incorrect Username or Password')));
+      });
+
     }
+            }
     else {
       setState(() {
         _isLoading = false;
@@ -99,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
             style: TextStyle(color: Colors.white70),
             decoration: InputDecoration(
               icon: Icon(Icons.email, color: Colors.white70),
-              hintText: "Email",
+              hintText: "Enter Username",
               border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)),
               hintStyle: TextStyle(color: Colors.white70),
             ),
@@ -112,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
             style: TextStyle(color: Colors.white70),
             decoration: InputDecoration(
               icon: Icon(Icons.lock, color: Colors.white70),
-              hintText: "Password",
+              hintText: "Enter Password",
               border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)),
               hintStyle: TextStyle(color: Colors.white70),
             ),
@@ -134,3 +147,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
